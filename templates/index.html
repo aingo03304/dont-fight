@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<title>Don't fight guys.</title>
+		<script>
+			function demo_submit(datetime, ta_id, team_id) {
+				if (team_id == '') {
+					alert('Team ID is null!');
+				} else {
+					fetch('/api/submit', {
+						'method': 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							"demo_datetime": datetime,
+							"ta_id": ta_id,
+							"team_id": team_id,
+						})
+					})
+					.then(function(res) {
+						var resJson = res.json();
+						resJson.then(data => {
+							alert(data.status.message);
+							location.reload();
+						})
+					});
+				}
+				
+			}
+		</script>
+		
+	</head>
+	<body>
+		<style>
+			table {
+				width: 100%;
+				border: 10px black;
+			}
+		</style>
+		<table>
+			<th>Time</th>
+			{% for ta_id in ta_list %}
+			<th>{{ ta_id }}</th>
+			{% endfor %}
+			
+			{% for time in time_list %}
+			<tr>
+				<td>
+					{{ time }}
+				</td>
+				{% for ta_id in ta_list %}
+				{% if (time, ta_id) in taken_time_ta %}
+				<td>
+					{{ taken_team_id[time + '_' + ta_id] }}
+				</td>
+				{% else %}
+				<td>
+					<input id="{{time}}_{{ta_id}}"/>
+					<button onclick="demo_submit('{{time}}', '{{ta_id}}', document.getElementById('{{time}}_{{ta_id}}').value);">Submit</button>
+				</td>
+				{% endif %}
+				{% endfor %}
+			</tr>
+			{% endfor %}			
+		</table>
+	</body>
+
+</html>
